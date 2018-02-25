@@ -19,6 +19,7 @@
 
 #include <fstream>
 #include <boost/program_options.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "Common/CommandLine.h"
 #include "Common/Util.h"
