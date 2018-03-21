@@ -1661,13 +1661,20 @@ BlockchainReadResult DatabaseBlockchainCache::readDatabase(BlockchainReadBatch& 
 }
 
 void DatabaseBlockchainCache::addGenesisBlock(CachedBlock&& genesisBlock) {
+  uint64_t minerReward = 0;
+  for (const TransactionOutput& output : genesisBlock.getBlock().baseTransaction.outputs) {
+    minerReward += output.amount;
+  }
+
+  assert(minerReward > 0);
+
   uint64_t baseTransactionSize = getObjectBinarySize(genesisBlock.getBlock().baseTransaction);
-  assert(baseTransactionSize < std::numeric_limits<uint32_t>::max());    
+  assert(baseTransactionSize < std::numeric_limits<uint32_t>::max());
 
   BlockchainWriteBatch batch;
 
   CachedBlockInfo blockInfo{genesisBlock.getBlockHash(), genesisBlock.getBlock().timestamp, 1,
-                            0, 1, uint32_t(baseTransactionSize)};
+                           minerReward, 1, uint32_t(baseTransactionSize)};
 
   auto baseTransaction = genesisBlock.getBlock().baseTransaction;
   auto cachedBaseTransaction = CachedTransaction{std::move(baseTransaction)};
